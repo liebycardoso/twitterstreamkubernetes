@@ -7,4 +7,4 @@ if script == 'pubsub-bq':
 elif script == 'publisher':
     os.system("python publisher.py")
 else:
-    print "unknown script %s" % script
+    print("unknown script %s" % script)
