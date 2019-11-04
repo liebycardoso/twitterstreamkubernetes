@@ -6,12 +6,14 @@ from tweepy import OAuthHandler
 from tweepy import Stream
 from tweepy import API
 from tweepy.streaming import StreamListener
+import json
 
 import utils
 
+# Reference:
+# https://github.com/GoogleCloudPlatform/kubernetes-bigquery-python/blob/master/pubsub/pubsub-pipe-image/twitter-to-pubsub.py
 
-# Get your twitter credentials from the environment variables.
-# These are set in the 'twitter-stream.json' manifest file.
+# Get twitter credentials from file.
 
 consumer_key = os.environ['CONSUMERKEY']
 consumer_secret = os.environ['CONSUMERSECRET']
@@ -23,7 +25,19 @@ PUBSUB_TOPIC = os.environ['PUBSUB_TOPIC']
 NUM_RETRIES = 3
 
 def publish(client, pubsub_topic, data_lines):
-    """Publish to the given pubsub topic."""
+    """
+    Add a message to a Google PubSub topic.
+    
+    JSON format:
+    {
+        "messages": [
+            {
+                object (PubsubMessage)
+            }
+        ]
+    }
+    """
+
     messages = []
     for line in data_lines:
         pub = base64.urlsafe_b64encode(line.encode('UTF-8')).decode('ascii')
@@ -35,35 +49,51 @@ def publish(client, pubsub_topic, data_lines):
 
 
 class StdOutListener(StreamListener):
-    """A listener handles tweets that are received from the stream.
-    This listener dumps the tweets into a PubSub topic
+    """
+    Gets data received from the stream tweepy function.
+    Filter data and publish into a PubSub topic
+
+    Tweepy doc:
+    In Tweepy, an instance of tweepy.Stream establishes 
+    a streaming session and routes messages to StreamListener instance. 
     """
 
     count = 0
     twstring = ''
     tweets = []
     batch_size = 50
-    total_tweets = 1
+    total_tweets = 1000
     client = utils.create_pubsub_client(utils.get_credentials())
 
-    def write_to_pubsub(self, tw):
-        print("passou no pubsub")
+    def write_to_pubsub(self, tw):        
         publish(self.client, PUBSUB_TOPIC, tw)
 
     def on_data(self, data):
-        """What to do when tweet data is received."""
+        """
+        Override Tweepy on_data method to manipulate 
+        the data content before publish to the 
+        pub-sub topic
+
+        Tweepy doc:
+        The on_data method of a stream listener receives all messages and calls 
+        functions according to the message type. The default StreamListener 
+        can classify most common twitter messages and routes them to appropriately 
+        named methods, but these methods are only stubs.
+        """
+
+        #Convert string to dict 
+        data = json.loads(data)
+
+        # filter only meaningful features               
+        data =  utils.filter_tweet(data, "str")
+
         self.tweets.append(data)
         print(data)
-        #if len(self.tweets) >= self.batch_size:
-        print("esta passando aqui")
-        self.write_to_pubsub(self.tweets)
-        self.tweets = []
+        if len(self.tweets) >= self.batch_size:
+            self.write_to_pubsub(self.tweets)
+            self.tweets = []
         
         self.count += 1
-        # if we've grabbed more than total_tweets tweets, exit the script.
-        # If this script is being run in the context of a kubernetes
-        # replicationController, the pod will be restarted fresh when
-        # that happens.
         if self.count > self.total_tweets:
             return False
         if (self.count % 1000) == 0:
@@ -75,26 +105,23 @@ class StdOutListener(StreamListener):
 
 
 if __name__ == '__main__':
-    print('....')
+
     listener = StdOutListener()
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
 
-    #print('stream mode is: %s' % os.environ['TWSTREAMMODE'])
-
     api = API(auth)
 
     stream = Stream(auth, listener)
-    # set up the streaming depending upon whether our mode is 'sample', which
-    # will sample the twitter public stream. If not 'sample', instead track
-    # the given set of keywords.
-    # This environment var is set in the 'twitter-stream.yaml' file.
-    ##if os.environ['TWSTREAMMODE'] == 'timeline':
-    #api.user_timeline(id='tferradura', count=2)
-    #stream.filter(follow=['632113108'])
-    ##else:
+    # if os.environ['TWSTREAMMODE'] == 'timeline':
+    # api.user_timeline(id='tferradura', count=2)
+    # stream.filter(follow=['632113108'])
+    # stream.userstream(track=[screen_name]) 
+    # else:
     
     stream.filter(
-            track=['cdnpoli', 'elxn43']
+            track=['#cdnpoli', '#elxn43','#CanadaElection2019', 
+            '#canpoli', '#CanadianElection', '#JustinTrudeau',
+            '#jagmeetsingh', '#AndrewScheer']
             )
     

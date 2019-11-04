@@ -1,6 +1,7 @@
 import collections
 import datetime
 import time
+import json
 
 from apiclient import discovery
 import dateutil.parser
@@ -35,6 +36,39 @@ def create_pubsub_client(credentials):
     http = httplib2.Http()
     credentials.authorize(http)
     return discovery.build('pubsub', 'v1beta2', http=http)
+
+def filter_tweet(data, return_type):
+
+    filter_data = {
+                    "created_at"	: data["created_at"],
+                    "id"	: data.get("id"),
+                    "text"	: data.get("text"),
+                    "quote_count"	: data.get("quote_count"),
+                    "reply_count"	: data.get("reply_count"),
+                    "retweet_count"	: data.get("retweet_count"),
+                    "favorite_count"	    : data.get("favorite_count"),
+                    "hashtags"	            : data.get("entities", {}).get("hashtags"),
+                    "user_screen_name"	    : data.get("user", {}).get("screen_name"),
+                    "user_location"	        : data.get("user", {}).get("location"),
+                    "user_verified"	        : data.get("user", {}).get("verified"),
+                    "user_followers_count"	: data.get("user", {}).get("followers_count"),
+                    "user_friends_count"	: data.get("user", {}).get("friends_count"),
+                    "user_listed_count"	    : data.get("user", {}).get("listed_count"),
+                    "user_favourites_count"	: data.get("user", {}).get("favourites_count"),
+                    "user_statuses_count"	: data.get("user", {}).get("statuses_count"),
+                    "rt_quote_count"	: data.get("retweeted_status", {}).get("quote_count"),
+                    "rt_reply_count"	: data.get("retweeted_status", {}).get("reply_count"),
+                    "rt_retweet_count"	: data.get("retweeted_status", {}).get("retweet_count"),
+                    "rt_favorite_count"	: data.get("retweeted_status", {}).get("favorite_count"),
+                    "rt_text"	        : data.get("retweeted_status", {}).get("extended_tweet", {}).get("full_text")
+                }
+
+    if return_type == "str":
+        # Convert dict to string
+        return json.dumps(filter_data)
+    else:
+        return filter_data
+
 
 
 def flatten(lst):
