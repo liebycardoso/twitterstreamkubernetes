@@ -88,7 +88,7 @@ class StdOutListener(StreamListener):
         data =  utils.filter_tweet(data, "str")
 
         self.tweets.append(data)
-        print(data)
+
         if len(self.tweets) >= self.batch_size:
             self.write_to_pubsub(self.tweets)
             self.tweets = []
@@ -122,6 +122,7 @@ if __name__ == '__main__':
     stream.filter(
             track=['#cdnpoli', '#elxn43','#CanadaElection2019', 
             '#canpoli', '#CanadianElection', '#JustinTrudeau',
-            '#jagmeetsingh', '#AndrewScheer']
+            '#jagmeetsingh', '#AndrewScheer', 'CPC_HQ', 'liberal_party',
+            '#ChooseForward', 'ndp', 'InItForYou']
             )
     

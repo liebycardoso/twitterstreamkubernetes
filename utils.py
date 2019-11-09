@@ -91,16 +91,15 @@ def cleanup(data):
             if (k == 'coordinates') and isinstance(v, list):
                 # flatten list
                 newdict[k] = list(flatten(v))
+			elif (k == 'hashtags') and isinstance(v, list):
+                # flatten list
+                newdict[k] = list(flatten(v)) 
             elif k == 'created_at' and v:
                 newdict[k] = str(dateutil.parser.parse(v))
             # temporarily, ignore some fields not supported by the
             # current BQ schema.
             # TODO: update BigQuery schema
-            elif (k == 'video_info' or k == 'scopes' or k == 'withheld_in_countries'
-                  or k == 'is_quote_status' or 'source_user_id' in k
-                  or k == ''
-                  or 'quoted_status' in k or 'display_text_range' in k or 'extended_tweet' in k
-                  or 'media' in k):
+            elif (k == ''):
                 pass
             elif v is False:
                 newdict[k] = v
