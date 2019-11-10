@@ -14,21 +14,13 @@ import utils
 # https://github.com/GoogleCloudPlatform/kubernetes-bigquery-python/blob/master/pubsub/pubsub-pipe-image/twitter-to-pubsub.py
 
 # Get twitter credentials from file.
-"""
+
 consumer_key = os.environ['CONSUMERKEY']
 consumer_secret = os.environ['CONSUMERSECRET']
 access_token = os.environ['ACCESSTOKEN']
 access_token_secret = os.environ['ACCESSTOKENSEC']
 
 PUBSUB_TOPIC = os.environ['PUBSUB_TOPIC']
-"""
-consumer_key = 'p0FfnDSxhh77pEXGh8wXqT9vs'
-consumer_secret = 'OANkAtcluujWmMjmROErL5uN6wvak3MX6Vx5o4j4zYL9uA3nMV'
-access_token = '1122204363844460546-b201c2H5TkEBw0sHvvtHn7vdgAq34c'
-access_token_secret = 'UJrn2kajSLiyQTv5kB6rnaTUugLwHXqnntOADrytYkHWm'
-
-PUBSUB_TOPIC = 'projects/heroic-gamma-254018/topics/tweets'
-
 
 NUM_RETRIES = 3
 
