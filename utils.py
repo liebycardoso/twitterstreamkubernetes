@@ -89,10 +89,8 @@ def cleanup(data):
         newdict = {}
         for k, v in data.items():
             if (k == 'coordinates') and isinstance(v, list):
-                # flatten list
                 newdict[k] = list(flatten(v))
-			elif (k == 'hashtags') and isinstance(v, list):
-                # flatten list
+            elif (k == 'hashtags') and isinstance(v, list):
                 newdict[k] = list(flatten(v)) 
             elif k == 'created_at' and v:
                 newdict[k] = str(dateutil.parser.parse(v))
