@@ -3,6 +3,7 @@ FROM python:3
 RUN pip install --upgrade pip
 RUN pip install tweepy
 RUN pip install --upgrade google-api-python-client
+RUN pip install --upgrade google-api-python-client oauth2client
 RUN pip install python-dateutil
 
 ADD publisher.py /publisher.py
