@@ -88,12 +88,9 @@ def cleanup(data):
     if isinstance(data, dict):
         newdict = {}
         for k, v in data.items():
-            if (k == 'coordinates') and isinstance(v, list):
+            if (k == 'hashtags') and isinstance(v, list):
                 # flatten list
                 newdict[k] = list(flatten(v))
-			elif (k == 'hashtags') and isinstance(v, list):
-                # flatten list
-                newdict[k] = list(flatten(v)) 
             elif k == 'created_at' and v:
                 newdict[k] = str(dateutil.parser.parse(v))
             # temporarily, ignore some fields not supported by the
