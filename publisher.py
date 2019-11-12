@@ -83,7 +83,7 @@ class StdOutListener(StreamListener):
         """
 
         # filter only meaningful features               
-        data =  utils.filter_tweet(json.loads(data), "str")
+        #data =  utils.filter_tweet(json.loads(data), "str")
 
         self.tweets.append(data)
 

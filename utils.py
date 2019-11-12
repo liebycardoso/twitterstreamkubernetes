@@ -88,7 +88,7 @@ def cleanup(data):
     if isinstance(data, dict):
         newdict = {}
         for k, v in data.items():
-            if (k == 'hashtags') and isinstance(v, list):
+            if (k == 'coordinates') and isinstance(v, list):
                 # flatten list
                 newdict[k] = list(flatten(v))
             elif k == 'created_at' and v:
