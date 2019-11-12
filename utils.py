@@ -117,19 +117,19 @@ def cleanup(data):
 
 def bq_data_insert(bigquery, project_id, dataset, table, tweets):
     """Insert a list of tweets into the given BigQuery table."""
-   #try:
-    rowlist = []
-    # Generate the data that will be sent to BigQuery
-    for item in tweets:
-        item_row = {"json": item}
-        rowlist.append(item_row)
-    body = {"rows": rowlist}
-    # Try the insertion.
-    response = bigquery.tabledata().insertAll(
-            projectId=project_id, datasetId=dataset,
-            tableId=table, body=body).execute(num_retries=NUM_RETRIES)
-    # print "streaming response: %s %s" % (datetime.datetime.now(), response)
-    return response
-    # TODO: 'invalid field' errors can be detected here.
-    #except Exception, e1:
-    #    print("Giving up: %s" % e1)
+    try:
+        rowlist = []
+        # Generate the data that will be sent to BigQuery
+        for item in tweets:
+            item_row = {"json": item}
+            rowlist.append(item_row)
+        body = {"rows": rowlist}
+        # Try the insertion.
+        response = bigquery.tabledata().insertAll(
+                projectId=project_id, datasetId=dataset,
+                tableId=table, body=body).execute(num_retries=NUM_RETRIES)
+        # print "streaming response: %s %s" % (datetime.datetime.now(), response)
+        return response
+        # TODO: 'invalid field' errors can be detected here.
+    except Exception as e1 :
+        print("Giving up: %s" % e1)
