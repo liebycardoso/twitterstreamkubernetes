@@ -26,22 +26,10 @@ PUBSUB_TOPIC = os.environ['PUBSUB_TOPIC']
 NUM_RETRIES = 3
 
 def publish(client, pubsub_topic, data_lines):
-    """
-    Add a message to a Google PubSub topic.
-    
-    JSON format:
-    {
-        "messages": [
-            {
-                object (PubsubMessage)
-            }
-        ]
-    }
-    """
-
+    """Publish to the given pubsub topic."""
     messages = []
     for line in data_lines:
-        pub = base64.urlsafe_b64encode(line.encode('UTF-8')).decode('ascii')
+        pub = base64.urlsafe_b64encode(line)
         messages.append({'data': pub})
     body = {'messages': messages}
     resp = client.projects().topics().publish(
@@ -50,26 +38,22 @@ def publish(client, pubsub_topic, data_lines):
 
 
 class StdOutListener(StreamListener):
-    """
-    Gets data received from the stream tweepy function.
-    Filter data and publish into a PubSub topic
-
-    Tweepy doc:
-    In Tweepy, an instance of tweepy.Stream establishes 
-    a streaming session and routes messages to StreamListener instance. 
+    """A listener handles tweets that are received from the stream.
+    This listener dumps the tweets into a PubSub topic
     """
 
     count = 0
     twstring = ''
     tweets = []
     batch_size = 50
-    total_tweets = 10000
+    total_tweets = 10000000
     client = utils.create_pubsub_client(utils.get_credentials())
 
-    def write_to_pubsub(self, tw):        
+    def write_to_pubsub(self, tw):
         publish(self.client, PUBSUB_TOPIC, tw)
 
     def on_data(self, data):
+        """What to do when tweet data is received."""
         """
         Override Tweepy on_data method to manipulate 
         the data content before publish to the 
@@ -83,34 +67,34 @@ class StdOutListener(StreamListener):
         """
 
         # filter only meaningful features               
-        #data =  utils.filter_tweet(json.loads(data), "str")
+        data =  utils.filter_tweet(json.loads(data), "str")
 
         self.tweets.append(data)
-
         if len(self.tweets) >= self.batch_size:
-            #print(len(self.tweets))
             self.write_to_pubsub(self.tweets)
             self.tweets = []
-        
         self.count += 1
+        # if we've grabbed more than total_tweets tweets, exit the script.
+        # If this script is being run in the context of a kubernetes
+        # replicationController, the pod will be restarted fresh when
+        # that happens.
         if self.count > self.total_tweets:
             return False
         if (self.count % 1000) == 0:
-            print('count is: %s at %s' % (self.count, datetime.datetime.now()))
+            print 'count is: %s at %s' % (self.count, datetime.datetime.now())
         return True
 
     def on_error(self, status):
-        print(status)
+        print status
 
 
 if __name__ == '__main__':
-
+    print '....'
     listener = StdOutListener()
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
 
-    #
-    # print('stream mode is: %s' % os.environ['TWSTREAMMODE'])
+    print 'stream mode is: %s' % os.environ['TWSTREAMMODE']
 
     stream = Stream(auth, listener)
     # set up the streaming depending upon whether our mode is 'sample', which

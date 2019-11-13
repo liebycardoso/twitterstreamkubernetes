@@ -14,8 +14,6 @@ SCOPES = ['https://www.googleapis.com/auth/bigquery',
           'https://www.googleapis.com/auth/pubsub']
 NUM_RETRIES = 3
 
-
-
 def get_credentials():
     """Get the Google credentials needed to access our services."""
     credentials = GoogleCredentials.get_application_default()
@@ -76,7 +74,7 @@ def flatten(lst):
     #basestring=[]
     for el in lst:
         if (isinstance(el, collections.Iterable) and
-                not isinstance(el, (str, bytes))):
+                not isinstance(el, basestring)):
             for sub in flatten(el):
                 yield sub
         else:
@@ -131,5 +129,5 @@ def bq_data_insert(bigquery, project_id, dataset, table, tweets):
         # print "streaming response: %s %s" % (datetime.datetime.now(), response)
         return response
         # TODO: 'invalid field' errors can be detected here.
-    except Exception as e1 :
-        print("Giving up: %s" % e1)
+    except Exception, e1:
+        print "Giving up: %s" % e1

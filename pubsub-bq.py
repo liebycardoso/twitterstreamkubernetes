@@ -1,3 +1,21 @@
+#!/usr/bin/env python
+# Copyright 2015 Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""This script grabs tweets from a PubSub topic, and stores them in BiqQuery
+using the BigQuery Streaming API.
+"""
+
 import base64
 import datetime
 import json
@@ -20,13 +38,12 @@ def fqrn(resource_type, project, resource):
 
 def create_subscription(client, project_name, sub_name):
     """Creates a new subscription to a given topic."""
-    print("using pubsub topic: %s" % PUBSUB_TOPIC)
+    print "using pubsub topic: %s" % PUBSUB_TOPIC
     name = get_full_subscription_name(project_name, sub_name)
     body = {'topic': PUBSUB_TOPIC}
     subscription = client.projects().subscriptions().create(
             name=name, body=body).execute(num_retries=NUM_RETRIES)
-    print( 'Subscription {} was created.'.format(subscription['name']))
-    return subscription
+    print 'Subscription {} was created.'.format(subscription['name'])
 
 
 def get_full_subscription_name(project, subscription):
@@ -48,7 +65,7 @@ def pull_messages(client, project_name, sub_name):
                 subscription=subscription, body=body).execute(
                         num_retries=NUM_RETRIES)
     except Exception as e:
-        print ("Exception: %s" % e)
+        print "Exception: %s" % e
         time.sleep(0.5)
         return
     receivedMessages = resp.get('receivedMessages')
@@ -58,7 +75,7 @@ def pull_messages(client, project_name, sub_name):
                 message = receivedMessage.get('message')
                 if message:
                         tweets.append(
-                            base64.urlsafe_b64decode(message.get('data').encode('utf8')))
+                            base64.urlsafe_b64decode(str(message.get('data'))))
                         ack_ids.append(receivedMessage.get('ackId'))
         ack_body = {'ackIds': ack_ids}
         client.projects().subscriptions().acknowledge(
@@ -83,11 +100,10 @@ def write_to_bq(pubsub, sub_name, bigquery):
             twmessages = pull_messages(pubsub, PROJECT_ID, sub_name)
             if twmessages:
                 for res in twmessages:
-                    
                     try:
                         tweet = json.loads(res)
-                    except Exception as bqe:
-                        print (bqe)
+                    except Exception, bqe:
+                        print bqe
                     # First do some massaging of the raw data
                     mtweet = utils.cleanup(tweet)
                     # We only want to write tweets to BigQuery; we'll skip
@@ -99,7 +115,7 @@ def write_to_bq(pubsub, sub_name, bigquery):
                     tweets.append(mtweet)
             else:
                 # pause before checking again
-                print ('sleeping...')
+                print 'sleeping...'
                 time.sleep(WAIT)
         response = utils.bq_data_insert(bigquery, PROJECT_ID, os.environ['BQ_DATASET'],
                              os.environ['BQ_TABLE'], tweets)
@@ -114,14 +130,14 @@ if __name__ == '__main__':
     topic_info = PUBSUB_TOPIC.split('/')
     topic_name = topic_info[-1]
     sub_name = "tweets-%s" % topic_name
-    print ("starting write to BigQuery....")
+    print "starting write to BigQuery...."
     credentials = utils.get_credentials()
     bigquery = utils.create_bigquery_client(credentials)
     pubsub = utils.create_pubsub_client(credentials)
     try:
         # TODO: check if subscription exists first
         subscription = create_subscription(pubsub, PROJECT_ID, sub_name)
-    except Exception as e:
-        print (e)
+    except Exception, e:
+        print e
     write_to_bq(pubsub, sub_name, bigquery)
-    print ('exited write loop')
+    print 'exited write loop'
