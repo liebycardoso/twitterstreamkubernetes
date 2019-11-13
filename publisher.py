@@ -88,8 +88,8 @@ class StdOutListener(StreamListener):
         self.tweets.append(data)
 
         if len(self.tweets) >= self.batch_size:
-            print(len(self.tweets))
-            #self.write_to_pubsub(self.tweets)
+            #print(len(self.tweets))
+            self.write_to_pubsub(self.tweets)
             self.tweets = []
         
         self.count += 1
