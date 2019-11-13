@@ -58,7 +58,7 @@ def pull_messages(client, project_name, sub_name):
                 message = receivedMessage.get('message')
                 if message:
                         tweets.append(
-                            base64.urlsafe_b64decode(str(message.get('data'))))
+                            base64.urlsafe_b64decode(message.get('data').encode('utf8')))
                         ack_ids.append(receivedMessage.get('ackId'))
         ack_body = {'ackIds': ack_ids}
         client.projects().subscriptions().acknowledge(

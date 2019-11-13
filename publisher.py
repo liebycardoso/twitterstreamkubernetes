@@ -41,7 +41,7 @@ def publish(client, pubsub_topic, data_lines):
 
     messages = []
     for line in data_lines:
-        pub = base64.urlsafe_b64encode(line.encode()).decode()
+        pub = base64.urlsafe_b64encode(line.encode('UTF-8')).decode('ascii')
         messages.append({'data': pub})
     body = {'messages': messages}
     resp = client.projects().topics().publish(
