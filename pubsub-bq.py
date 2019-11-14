@@ -4,7 +4,6 @@ using the BigQuery Streaming API.
 """
 
 import base64
-import datetime
 import json
 import os
 import time
@@ -16,7 +15,7 @@ from google.cloud import pubsub
 
 PROJECT_ID = os.environ['PROJECT_ID']
 PUBSUB_TOPIC = os.environ['PUBSUB_TOPIC']
-BQ_DATASET= os.environ['BQ_DATASET'], 
+BQ_DATASET= os.environ['BQ_DATASET'] 
 BQ_TABLE = os.environ['BQ_TABLE']
 
 NUM_RETRIES = 3
@@ -49,7 +48,7 @@ def write_tweets_to_bq(dataset_id, table_id, tweets):
             bigquery.SchemaField('rt_favorite_count', 'INTEGER', mode='NULLABLE'),
             bigquery.SchemaField('rt_text', 'STRING', mode='NULLABLE')
     ]
-    print(tweets)
+    
     errors = client.insert_rows(table, tweets, selected_fields = schema)
     if not errors:
         print('Loaded {} row(s) into {}:{}'.format(len(tweets), dataset_id, table_id))
@@ -67,7 +66,6 @@ def collect_tweets(data):
     twmessages = twraw.get('messages')
     for message in twmessages:
         tweets.append(message['data'])
-    print(tweets)
 
     write_tweets_to_bq(BQ_DATASET, 
                        BQ_TABLE, 

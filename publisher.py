@@ -115,7 +115,7 @@ class StdOutListener(StreamListener):
         if self.count >= self.total_tweets:
             return False
         if (self.count % 100) == 0:
-            print('count is: %s at %s' % (self.count, datetime.datetime.now()))
+            print('count is: %s' % (self.count))
         return True
 
     def on_error(self, status):
