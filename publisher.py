@@ -50,8 +50,8 @@ class StdOutListener(StreamListener):
     count = 0
     twstring = ''
     tweets = []
-    batch_size = 1
-    total_tweets = 2
+    batch_size = 50
+    total_tweets = 1000000
     
     def write_to_pubsub(self, tw):
         publish(self.publisher, PUBSUB_TOPIC, tw)
