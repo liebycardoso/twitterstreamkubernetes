@@ -5,7 +5,6 @@ import os
 import tweepy
 from tweepy import OAuthHandler
 from tweepy import Stream
-from tweepy import API
 from tweepy.streaming import StreamListener
 import json
 from google.cloud import pubsub_v1
@@ -20,13 +19,13 @@ consumer_key = os.environ['CONSUMERKEY']
 consumer_secret = os.environ['CONSUMERSECRET']
 access_token = os.environ['ACCESSTOKEN']
 access_token_secret = os.environ['ACCESSTOKENSEC']
-
 PUBSUB_TOPIC = os.environ['PUBSUB_TOPIC']
 PROJECT_ID = os.environ['PROJECT_ID']
-
+TWSTREAMMODE = os.environ['TWSTREAMMODE']
 
 NUM_RETRIES = 3
 NUMBER_OF_TWEETS = 4000
+BATCH_SIZE = 50
 
 def publish(client, topic_path, data_lines):
     """Publish to the given pubsub topic."""
@@ -62,31 +61,32 @@ def filter_data(data, type):
                         int(data.get("user", {}).get("listed_count",0)),
                         int(data.get("user", {}).get("favourites_count",0)),
                         int(data.get("user", {}).get("statuses_count",0))                            
-                        )          
+                    )          
     except Exception as e:
         print(e)
         pass
     return data
 
-
-
-
-def process_timeline(username):
+def process_timeline(username, n_weets):
     tml= []
-    #tml = API.user_timeline(screen_name=user, count=200, tweet_mode="extended")
+    count = 0
 
     for item in tweepy.Cursor(api.user_timeline,
                              screen_name=username,
                              tweet_mode="extended",
-                             languages=["en"]).items(NUMBER_OF_TWEETS):
+                             languages=["en"]).items(n_weets):
         try:
-            tml.append(filter_data(json.dumps(item._json),"full_text"))
+            data = filter_data(json.dumps(item._json),"full_text")
+            if len(data) <= 15:
+                tml.append(data)
+            
+            if len(tml) >= BATCH_SIZE:
+                publish(publisher, PUBSUB_TOPIC, tml)
+                tml = []
+
+            count += 1
         except Exception as e:
             print(e)
-    if len(tml) > 0:
-        publish(publisher, PUBSUB_TOPIC, tml)
-        
-    return tml
 
 class StdOutListener(StreamListener):
     """A listener handles tweets that are received from the stream.
@@ -96,8 +96,7 @@ class StdOutListener(StreamListener):
     count = 0
     twstring = ''
     tweets = []
-    batch_size = 50
-    total_tweets = 40000
+    total_tweets = 10000
     
     def write_to_pubsub(self, tw):
         publish(publisher, PUBSUB_TOPIC, tw)
@@ -115,10 +114,13 @@ class StdOutListener(StreamListener):
         can classify most common twitter messages and routes them to appropriately 
         named methods, but these methods are only stubs.
         """
-        self.tweets.append(filter_data(data, "text"))
+        
+        data = filter_data(data, "text")
+        if len(data) <= 15:
+            self.tweets.append(data)
 
                 
-        if len(self.tweets) >= self.batch_size:
+        if len(self.tweets) >= BATCH_SIZE:
             self.write_to_pubsub(self.tweets)
             self.tweets = []
 
@@ -155,10 +157,11 @@ if __name__ == '__main__':
     api = tweepy.API(auth)
     #follow=['14260960', '253340075', '256360738'])
     #['JustinTrudeau', 'AndrewScheer', 'theJagmeetSingh']
-
-    process_timeline("JustinTrudeau")
-    process_timeline("AndrewScheer")
-    process_timeline("theJagmeetSingh")
+    
+    if TWSTREAMMODE == "timeline":
+        process_timeline("JustinTrudeau", NUMBER_OF_TWEETS)
+        process_timeline("AndrewScheer", NUMBER_OF_TWEETS)
+        process_timeline("theJagmeetSingh", NUMBER_OF_TWEETS)
 
     stream.filter(languages=["en"],
             track=['#cdnpoli', '#elxn43','#CanadaElection2019', 
