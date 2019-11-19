@@ -83,8 +83,8 @@ def process_timeline(username):
             tml.append(filter_data(json.dumps(item._json),"full_text"))
         except Exception as e:
             print(e)
-    # tml:
-    #    publish(publisher, PUBSUB_TOPIC, tml)
+    if len(tml) > 0:
+        publish(publisher, PUBSUB_TOPIC, tml)
         
     return tml
 
@@ -119,7 +119,7 @@ class StdOutListener(StreamListener):
 
                 
         if len(self.tweets) >= self.batch_size:
-            #self.write_to_pubsub(self.tweets)
+            self.write_to_pubsub(self.tweets)
             self.tweets = []
 
         self.count += 1
