@@ -2,6 +2,7 @@
 import base64
 from datetime import datetime
 import os
+import tweepy
 from tweepy import OAuthHandler
 from tweepy import Stream
 from tweepy import API
@@ -14,6 +15,7 @@ from google.cloud import pubsub_v1
 
 # Get twitter credentials from file.
 
+
 consumer_key = os.environ['CONSUMERKEY']
 consumer_secret = os.environ['CONSUMERSECRET']
 access_token = os.environ['ACCESSTOKEN']
@@ -22,7 +24,9 @@ access_token_secret = os.environ['ACCESSTOKENSEC']
 PUBSUB_TOPIC = os.environ['PUBSUB_TOPIC']
 PROJECT_ID = os.environ['PROJECT_ID']
 
+
 NUM_RETRIES = 3
+NUMBER_OF_TWEETS = 4000
 
 def publish(client, topic_path, data_lines):
     """Publish to the given pubsub topic."""
@@ -34,27 +38,69 @@ def publish(client, topic_path, data_lines):
     data = base64.urlsafe_b64encode(bytearray(str_body, 'utf8'))
     client.publish(topic_path, data=data)
 
+def filter_data(data, type):
+    data = json.loads(data)
+    try:  
+        
+        # filter only meaningful features 
+        if 'retweeted_status' in data:
+            pass
+        else:                             
+            data = (                
+                        str(datetime.strptime(data["created_at"], '%a %b %d %H:%M:%S %z %Y')),
+                        int(data.get("id",0)),
+                        data.get(type),
+                        int(data.get("quote_count", 0)),
+                        int(data.get("reply_count", 0)),
+                        int(data.get("retweet_count", 0)),
+                        int(data.get("favorite_count",0)),
+                        data.get("user", {}).get("screen_name", "null"),
+                        data.get("user", {}).get("location","null"),
+                        bool(data.get("user", {}).get("verified",False)),
+                        int(data.get("user", {}).get("followers_count",0)),
+                        int(data.get("user", {}).get("friends_count",0)),
+                        int(data.get("user", {}).get("listed_count",0)),
+                        int(data.get("user", {}).get("favourites_count",0)),
+                        int(data.get("user", {}).get("statuses_count",0))                            
+                        )          
+    except Exception as e:
+        print(e)
+        pass
+    return data
+
+
+
+
+def process_timeline(username):
+    tml= []
+    #tml = API.user_timeline(screen_name=user, count=200, tweet_mode="extended")
+
+    for item in tweepy.Cursor(api.user_timeline,
+                             screen_name=username,
+                             tweet_mode="extended",
+                             languages=["en"]).items(NUMBER_OF_TWEETS):
+        try:
+            tml.append(filter_data(json.dumps(item._json),"full_text"))
+        except Exception as e:
+            print(e)
+    # tml:
+    #    publish(publisher, PUBSUB_TOPIC, tml)
+        
+    return tml
 
 class StdOutListener(StreamListener):
     """A listener handles tweets that are received from the stream.
     This listener dumps the tweets into a PubSub topic
     """
-    batch_settings = pubsub_v1.types.BatchSettings(
-    max_bytes=1024,  # One kilobyte
-    max_latency=1,   # One second
-)
-
-    publisher = pubsub_v1.PublisherClient(batch_settings)
-    topic_path = publisher.topic_path(PROJECT_ID, PUBSUB_TOPIC)# pylint: disable=maybe-no-member
-
+    
     count = 0
     twstring = ''
     tweets = []
     batch_size = 50
-    total_tweets = 1000000
+    total_tweets = 40000
     
     def write_to_pubsub(self, tw):
-        publish(self.publisher, PUBSUB_TOPIC, tw)
+        publish(publisher, PUBSUB_TOPIC, tw)
 
     def on_data(self, data):
         """What to do when tweet data is received."""
@@ -69,42 +115,11 @@ class StdOutListener(StreamListener):
         can classify most common twitter messages and routes them to appropriately 
         named methods, but these methods are only stubs.
         """
-        try:
-            data = json.loads(data)
-            # filter only meaningful features 
-            
-            filter_data = (                
-                        str(datetime.strptime(data["created_at"], '%a %b %d %H:%M:%S %z %Y')),
-                        int(data.get("id",0)),
-                        data.get("text"),
-                        int(data.get("quote_count", 1)),
-                        int(data.get("reply_count", 1)),
-                        int(data.get("retweet_count", 1)),
-                        int(data.get("favorite_count",1)),
-                        "empty",
-                        data.get("user", {}).get("screen_name", "empty"),
-                        data.get("user", {}).get("location","empty"),
-                        bool(data.get("user", {}).get("verified",False)),
-                        int(data.get("user", {}).get("followers_count",1)),
-                        int(data.get("user", {}).get("friends_count",1)),
-                        int(data.get("user", {}).get("listed_count",1)),
-                        int(data.get("user", {}).get("favourites_count",1)),
-                        int(data.get("user", {}).get("statuses_count",1)),
-                        int(data.get("retweeted_status", {}).get("quote_count",1)),
-                        int(data.get("retweeted_status", {}).get("reply_count",1)),
-                        int(data.get("retweeted_status", {}).get("retweet_count",1)),
-                        int(data.get("retweeted_status", {}).get("favorite_count",1)),
-                        data.get("retweeted_status", {}).get("extended_tweet", {}).get("full_text", "empty")
-            )          
-                    
-            self.tweets.append(filter_data)
-        except Exception as e:
-            print(e)
-            pass
-        
-        
+        self.tweets.append(filter_data(data, "text"))
+
+                
         if len(self.tweets) >= self.batch_size:
-            self.write_to_pubsub(self.tweets)
+            #self.write_to_pubsub(self.tweets)
             self.tweets = []
 
         self.count += 1
@@ -123,21 +138,33 @@ class StdOutListener(StreamListener):
 
 
 if __name__ == '__main__':
+
+    batch_settings = pubsub_v1.types.BatchSettings(
+    max_bytes=1024,  # One kilobyte
+    max_latency=1,   # One second
+    )
+
+    publisher = pubsub_v1.PublisherClient(batch_settings)
+    topic_path = publisher.topic_path(PROJECT_ID, PUBSUB_TOPIC)# pylint: disable=maybe-no-member
+
     listener = StdOutListener()
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
 
     stream = Stream(auth, listener)
-    # set up the streaming depending upon whether our mode is 'sample', which
-    # will sample the twitter public stream. If not 'sample', instead track
-    # the given set of keywords.
-    # This environment var is set in the 'twitter-stream.yaml' file.
-    if os.environ['TWSTREAMMODE'] == 'sample':
-        stream.sample()
-    else:
-        stream.filter(
+    api = tweepy.API(auth)
+    #follow=['14260960', '253340075', '256360738'])
+    #['JustinTrudeau', 'AndrewScheer', 'theJagmeetSingh']
+
+    process_timeline("JustinTrudeau")
+    process_timeline("AndrewScheer")
+    process_timeline("theJagmeetSingh")
+
+    stream.filter(languages=["en"],
             track=['#cdnpoli', '#elxn43','#CanadaElection2019', 
             '#canpoli', '#CanadianElection', '#JustinTrudeau',
             '#jagmeetsingh', '#AndrewScheer', 'CPC_HQ', 'liberal_party',
             '#ChooseForward', 'ndp', 'InItForYou']
         )
+    
+    

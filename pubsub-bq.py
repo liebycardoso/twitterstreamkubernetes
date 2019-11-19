@@ -33,7 +33,6 @@ def write_tweets_to_bq(dataset_id, table_id, tweets):
             bigquery.SchemaField('reply_count', 'INTEGER', mode='NULLABLE'),
             bigquery.SchemaField('retweet_count', 'INTEGER', mode='NULLABLE'),
             bigquery.SchemaField('favorite_count', 'INTEGER', mode='NULLABLE'),
-            bigquery.SchemaField('hashtags', 'STRING', mode='NULLABLE'),
             bigquery.SchemaField('user_screen_name', 'STRING', mode='NULLABLE'),
             bigquery.SchemaField('user_location', 'STRING', mode='NULLABLE'),
             bigquery.SchemaField('user_verified', 'BOOLEAN', mode='NULLABLE'),
@@ -41,12 +40,7 @@ def write_tweets_to_bq(dataset_id, table_id, tweets):
             bigquery.SchemaField('user_friends_count', 'INTEGER', mode='NULLABLE'),
             bigquery.SchemaField('user_listed_count', 'INTEGER', mode='NULLABLE'),
             bigquery.SchemaField('user_favourites_count', 'INTEGER', mode='NULLABLE'),
-            bigquery.SchemaField('user_statuses_count', 'INTEGER', mode='NULLABLE'),
-            bigquery.SchemaField('rt_quote_count', 'INTEGER', mode='NULLABLE'),
-            bigquery.SchemaField('rt_reply_count', 'INTEGER', mode='NULLABLE'),
-            bigquery.SchemaField('rt_retweet_count', 'INTEGER', mode='NULLABLE'),
-            bigquery.SchemaField('rt_favorite_count', 'INTEGER', mode='NULLABLE'),
-            bigquery.SchemaField('rt_text', 'STRING', mode='NULLABLE')
+            bigquery.SchemaField('user_statuses_count', 'INTEGER', mode='NULLABLE')
     ]
     
     errors = client.insert_rows(table, tweets, selected_fields = schema)
