@@ -60,7 +60,8 @@ def filter_data(data, type):
                         int(data.get("user", {}).get("friends_count",0)),
                         int(data.get("user", {}).get("listed_count",0)),
                         int(data.get("user", {}).get("favourites_count",0)),
-                        int(data.get("user", {}).get("statuses_count",0))                            
+                        int(data.get("user", {}).get("statuses_count",0)),                            
+                        int(data.get("user", {}).get("description",0))
                     )          
     except Exception as e:
         print(e)

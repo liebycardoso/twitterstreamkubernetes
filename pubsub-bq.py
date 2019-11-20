@@ -40,7 +40,8 @@ def write_tweets_to_bq(dataset_id, table_id, tweets):
             bigquery.SchemaField('user_friends_count', 'INTEGER', mode='NULLABLE'),
             bigquery.SchemaField('user_listed_count', 'INTEGER', mode='NULLABLE'),
             bigquery.SchemaField('user_favourites_count', 'INTEGER', mode='NULLABLE'),
-            bigquery.SchemaField('user_statuses_count', 'INTEGER', mode='NULLABLE')
+            bigquery.SchemaField('user_statuses_count', 'INTEGER', mode='NULLABLE'),
+            bigquery.SchemaField('user_description', 'STRING', mode='NULLABLE')
     ]
     
     errors = client.insert_rows(table, tweets, selected_fields = schema)
