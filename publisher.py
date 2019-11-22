@@ -91,7 +91,7 @@ def process_timeline(username, n_weets):
             if len(data) <= FEATURES_LEN:
                 tml.append(data)
             
-            if len(tml) <= BATCH_SIZE:
+            if len(tml) >=  BATCH_SIZE:
                 publish(publisher, PUBSUB_TOPIC, tml)
                 tml = []
 
@@ -169,7 +169,7 @@ if __name__ == '__main__':
     #follow=['14260960', '253340075', '256360738'])
     #['JustinTrudeau', 'AndrewScheer', 'theJagmeetSingh']
     
-  
+ 
     if TWSTREAMMODE == "timeline":
         process_timeline("JustinTrudeau", NUMBER_OF_TWEETS)
         process_timeline("AndrewScheer", NUMBER_OF_TWEETS)
