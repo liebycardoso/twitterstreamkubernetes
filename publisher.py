@@ -11,9 +11,9 @@ from google.cloud import pubsub_v1
 
 # Reference:
 # https://github.com/GoogleCloudPlatform/kubernetes-bigquery-python/blob/master/pubsub/pubsub-pipe-image/twitter-to-pubsub.py
+# Python version 3
 
 # Get twitter credentials from file.
-
 consumer_key = os.environ['CONSUMERKEY']
 consumer_secret = os.environ['CONSUMERSECRET']
 access_token = os.environ['ACCESSTOKEN']
@@ -90,7 +90,7 @@ def process_timeline(username, n_weets):
             data = filter_data(json.dumps(item._json))
             if len(data) <= FEATURES_LEN:
                 tml.append(data)
-            
+                            
             if len(tml) >=  BATCH_SIZE:
                 publish(publisher, PUBSUB_TOPIC, tml)
                 tml = []
@@ -129,7 +129,6 @@ class StdOutListener(StreamListener):
         data = filter_data(data)
         if len(data) <= FEATURES_LEN:
             self.tweets.append(data)
-
                 
         if len(self.tweets) >= BATCH_SIZE:
             self.write_to_pubsub(self.tweets)
@@ -169,7 +168,6 @@ if __name__ == '__main__':
     #follow=['14260960', '253340075', '256360738'])
     #['JustinTrudeau', 'AndrewScheer', 'theJagmeetSingh']
     
- 
     if TWSTREAMMODE == "timeline":
         process_timeline("JustinTrudeau", NUMBER_OF_TWEETS)
         process_timeline("AndrewScheer", NUMBER_OF_TWEETS)
@@ -181,5 +179,4 @@ if __name__ == '__main__':
             '#jagmeetsingh', '#AndrewScheer', 'CPC_HQ', 'liberal_party',
             '#ChooseForward', 'ndp', 'InItForYou']
         )
-    
     
