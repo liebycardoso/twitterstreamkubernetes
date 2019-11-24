@@ -177,6 +177,6 @@ if __name__ == '__main__':
             track=['#cdnpoli', '#elxn43','#CanadaElection2019', 
             '#canpoli', '#CanadianElection', '#JustinTrudeau',
             '#jagmeetsingh', '#AndrewScheer', 'CPC_HQ', 'liberal_party',
-            '#ChooseForward', 'ndp', 'InItForYou']
+            '#ChooseForward', '#ndp', 'InItForYou', '#cpc', '#lpc']
         )
     
