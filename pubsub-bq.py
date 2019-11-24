@@ -75,7 +75,7 @@ class tweet_subscriber():
         
         def callback(message):
             print('Received message: {}'.format(message))
-            self.pull_tweets(message)
+            self.pull_tweets(message.data)
             message.ack()
 
         future = subscriber.subscribe(subscription_path, callback=callback)
