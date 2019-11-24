@@ -81,7 +81,9 @@ def filter_data(data):
 def process_timeline(username, n_weets):
     tml= []
     count = 0
-
+    publisher = pubsub_v1.PublisherClient()
+    topic_path = publisher.topic_path(PROJECT_ID, PUBSUB_TOPIC)# pylint: disable=maybe-no-member
+    
     for item in tweepy.Cursor(api.user_timeline,
                              screen_name=username,
                              tweet_mode="extended",
@@ -107,10 +109,14 @@ class StdOutListener(StreamListener):
     count = 0
     twstring = ''
     tweets = []
-    total_tweets = 10000
+    batch_size = 50
+    total_tweets = 100000
+
+    publisher = pubsub_v1.PublisherClient()
+    topic_path = publisher.topic_path(PROJECT_ID, PUBSUB_TOPIC)# pylint: disable=maybe-no-member
     
     def write_to_pubsub(self, tw):
-        publish(publisher, PUBSUB_TOPIC, tw)
+        publish(self.publisher, PUBSUB_TOPIC, tw)
 
     def on_data(self, data):
         """What to do when tweet data is received."""
@@ -130,7 +136,7 @@ class StdOutListener(StreamListener):
         if len(data) <= FEATURES_LEN:
             self.tweets.append(data)
                 
-        if len(self.tweets) >= BATCH_SIZE:
+        if len(self.tweets) >= self.batch_size:
             self.write_to_pubsub(self.tweets)
             self.tweets = []
 
@@ -156,8 +162,8 @@ if __name__ == '__main__':
     max_latency=1,   # One second
     )
 
-    publisher = pubsub_v1.PublisherClient(batch_settings)
-    topic_path = publisher.topic_path(PROJECT_ID, PUBSUB_TOPIC)# pylint: disable=maybe-no-member
+    #publisher = pubsub_v1.PublisherClient(batch_settings)
+    #topic_path = publisher.topic_path(PROJECT_ID, PUBSUB_TOPIC)# pylint: disable=maybe-no-member
 
     listener = StdOutListener()
     auth = OAuthHandler(consumer_key, consumer_secret)
@@ -168,11 +174,12 @@ if __name__ == '__main__':
     #follow=['14260960', '253340075', '256360738'])
     #['JustinTrudeau', 'AndrewScheer', 'theJagmeetSingh']
     
+    """
     if TWSTREAMMODE == "timeline":
         process_timeline("JustinTrudeau", NUMBER_OF_TWEETS)
         process_timeline("AndrewScheer", NUMBER_OF_TWEETS)
         process_timeline("theJagmeetSingh", NUMBER_OF_TWEETS)
-   
+    """
     stream.filter(languages=["en"],
             track=['#cdnpoli', '#elxn43','#CanadaElection2019', 
             '#canpoli', '#CanadianElection', '#JustinTrudeau',
