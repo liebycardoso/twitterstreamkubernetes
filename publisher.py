@@ -14,6 +14,7 @@ from google.cloud import pubsub_v1
 # Python version 3
 
 # Get twitter credentials from file.
+
 consumer_key = os.environ['CONSUMERKEY']
 consumer_secret = os.environ['CONSUMERSECRET']
 access_token = os.environ['ACCESSTOKEN']
@@ -23,9 +24,9 @@ PROJECT_ID = os.environ['PROJECT_ID']
 TWSTREAMMODE = os.environ['TWSTREAMMODE']
 
 NUM_RETRIES = 3
-NUMBER_OF_TWEETS = 10000
+NUMBER_OF_TWEETS = 40000
 BATCH_SIZE = 50
-FEATURES_LEN = 16
+FEATURES_LEN = 17
 
 def publish(client, topic_path, data_lines):
     """Publish to the given pubsub topic."""
@@ -71,7 +72,7 @@ def filter_data(data):
                         int(data.get("user", {}).get("listed_count",0)),
                         int(data.get("user", {}).get("favourites_count",0)),
                         int(data.get("user", {}).get("statuses_count",0)),                            
-                        data.get("user", {}).get("description","null"),
+                        data.get("user", {}).get("description",""),
                         str(datetime.strptime(data.get("user", {}).get("created_at"), '%a %b %d %H:%M:%S %z %Y'))
                     )          
     except Exception as e:
@@ -175,12 +176,12 @@ if __name__ == '__main__':
     #follow=['14260960', '253340075', '256360738'])
     #['JustinTrudeau', 'AndrewScheer', 'theJagmeetSingh']
     
-    """
+    
     if TWSTREAMMODE == "timeline":
         process_timeline("JustinTrudeau", NUMBER_OF_TWEETS)
         process_timeline("AndrewScheer", NUMBER_OF_TWEETS)
         process_timeline("theJagmeetSingh", NUMBER_OF_TWEETS)
-    """
+    
     stream.filter(languages=["en"],
             track=['#cdnpoli', '#elxn43','#CanadaElection2019', 
             '#canpoli', '#CanadianElection', '#JustinTrudeau',
