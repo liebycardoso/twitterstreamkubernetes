@@ -42,7 +42,8 @@ class tweet_subscriber():
                 bigquery.SchemaField('user_listed_count', 'INTEGER', mode='NULLABLE'),
                 bigquery.SchemaField('user_favourites_count', 'INTEGER', mode='NULLABLE'),
                 bigquery.SchemaField('user_statuses_count', 'INTEGER', mode='NULLABLE'),
-                bigquery.SchemaField('description', 'STRING', mode='NULLABLE')
+                bigquery.SchemaField('description', 'STRING', mode='NULLABLE'),
+                bigquery.SchemaField('user_created_at', 'TIMESTAMP', mode='NULLABLE')                
             ]
         
         errors = client.insert_rows(table, tweets, selected_fields = schema)

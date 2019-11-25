@@ -71,7 +71,8 @@ def filter_data(data):
                         int(data.get("user", {}).get("listed_count",0)),
                         int(data.get("user", {}).get("favourites_count",0)),
                         int(data.get("user", {}).get("statuses_count",0)),                            
-                        data.get("user", {}).get("description","null")
+                        data.get("user", {}).get("description","null"),
+                        str(datetime.strptime(data.get("user", {}).get("created_at"), '%a %b %d %H:%M:%S %z %Y')),
                     )          
     except Exception as e:
         print(e)
