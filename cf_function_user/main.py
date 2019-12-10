@@ -19,7 +19,8 @@ def aggregate_user(event, context):
         ' user_favourites_count, user_followers_count, user_listed_count, '+
         ' user_statuses_count, user_verified, creation_days, ' +
         ' description_count, desc_polarity as polarity, desc_subjectivity as subjectivity, desc_sentiment as sentiment '+
-        ' FROM capstonettw.sentiment ' 
+        ' FROM capstonettw.sentiment ' +
+         'WHERE EXTRACT(MONTH FROM DATE(date)) = 12' 
     #    'WHERE DATE(user_created_at) <= CURRENT_DATE() ' +
     #    ' WHERE date(date) = "2019-11-14" ' +
     #    'LIMIT 5'
@@ -51,9 +52,7 @@ def aggregate_user(event, context):
        'user_verified', 'creation_days', 'polarity', 'subjectivity',
        'sentiment_positive', 'sentiment_neutral', 'sentiment_negative']]
     
-    print(len(df))
-    print(df.columns)
-
+   
 
     try:
         #table_id = os.environ['TABLE_ID']

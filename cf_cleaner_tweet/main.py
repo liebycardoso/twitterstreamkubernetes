@@ -5,9 +5,9 @@ import pandas as pd
 from stop_words import get_stop_words
 import re
 import base64
-from textblob import TextBlob
+from textblob import TextBlob, Word
 from langdetect import detect
-from datetime import timedelta, datetime, date
+from datetime import datetime, date
 
 def return_date(x):
     return datetime.strptime(str(x), '%Y-%m-%d %H:%M:%S').date()
@@ -36,12 +36,13 @@ def cleaner_txt(text):
     '''
     if isinstance(text, str):   
         text = text.lower()
-        text =  ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)|(^rt)", " ", text).split())
+        text =  ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", text).split())
     else:
         text = ''
     return text
         
     return text
+
 def tokenization(text):
     return re.split('\W+', text)
 
@@ -53,6 +54,12 @@ def count_word(text):
     else:
         count = 0
     return count
+
+def clean_textblob(sentence):
+    stop_words = list(get_stop_words('en'))
+    sentence = re.split('\W+', sentence)
+    sentence =  " ".join([w for w in sentence if not w in stop_words])
+    return "".join([Word(w).lemmatize() for w in sentence])
 
   
 def get_sentiment_description(polarity): 
@@ -99,72 +106,39 @@ def tweet_cleaner(event, context):
 
     if len(df) > 0:
 
-        #df["date"] = df.date.apply(return_date)
-        
-        # Extract all the words that starts with #
+        df.drop_duplicates(subset=['user_screen_name', 'text'], keep='first', inplace=True)
+
         df["hashtags"] = df.text.apply(extract_hashtag)
         df["hashtags_count"]  = df.hashtags.apply(count_hashtag)
 
         # Use regex to clean the text
-        df["text"] = df.text.apply(cleaner_txt) 
+        df["text"] = df.text.apply(cleaner_txt)
+        df['text'] = df['text'].apply(clean_textblob)
+        df.drop(df[df.text ==''].index, inplace=True)
 
         df["description"] = df.description.apply(cleaner_txt) 
 
-        
-
-        df.drop(df[df.text ==''].index, inplace=True)
         df['lang'] = df.text.apply(check_language)
-
-        
-
         df.drop(df[df.lang !='en'].index, inplace=True)
-
         del df['lang']
-        df.drop_duplicates(subset=['user_screen_name', 'text'], keep='first', inplace=False)
-
-        try:
-            def remove_stop_word(word_list):
-                filter_word =  [w for w in word_list if not w in stop_words]
-
-                return  ' '.join(filter_word)
-
-            stop_words = list(get_stop_words('en'))         
-        except Exception as e:
-            print(e)
-
-        # Split the sentence into a array of words
-        df['text'] = df['text'].apply(tokenization)
-        # Remove Stop words
-        df['text'] = df.text.apply(remove_stop_word)
-
-        df['polarity'] = 0.0
-        df['subjectivity'] = 0.0
 
         df[['polarity', 'subjectivity']] = df['text'].apply(lambda text: pd.Series(TextBlob(text).sentiment))
-
         df['sentiment'] = df.polarity.apply(get_sentiment_description)
 
-        #df["creation_days"] = df.date.apply(lambda x: (date.today() - x).days)
-        df["creation_days"] = df.daysdf
-
-        del df["daysdf"]
         df['description_count'] = df.description.apply(count_word)
-
-        df['desc_polarity'] = 0.0
-        df['desc_subjectivity'] = 0.0
-
-        df[['desc_polarity', 'desc_subjectivity']] = df['description'].apply(lambda text: pd.Series(TextBlob(text).sentiment))
-
-        df['desc_sentiment'] = df.desc_polarity.apply(get_sentiment_description)
-
         df.fillna(value={'description': 'neutral'}, inplace=True)
-        df['desc_polarity'] = 0.0
-        df['desc_subjectivity'] = 0.0
 
+        df['description'] = df.description.apply(clean_textblob)
         df[['desc_polarity', 'desc_subjectivity']] = df['description'].apply(lambda text: pd.Series(TextBlob(text).sentiment))
-
         df['desc_sentiment'] = df.desc_polarity.apply(get_sentiment_description)
-                    
+
+        df = df[['text', 'quote_count', 'reply_count', 'retweet_count', 'favorite_count',
+            'user_screen_name', 'user_location', 'user_verified',
+            'user_followers_count', 'user_friends_count', 'user_listed_count',
+            'user_favourites_count', 'user_statuses_count', 'description', 'date',
+            'hashtags', 'hashtags_count', 'polarity', 'subjectivity', 'sentiment', 'creation_days', 'description_count', 'desc_polarity',
+            'desc_subjectivity', 'desc_sentiment']]
+                   
         try:
             #table_id = os.environ['TABLE_ID']
             #project_id = os.environ['PROJECT_ID']

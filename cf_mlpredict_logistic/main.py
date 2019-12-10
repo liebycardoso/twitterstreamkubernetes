@@ -9,15 +9,16 @@ def run_model_losgistic(event, context):
          event (dict): Event payload.
          context (google.cloud.functions.Context): Metadata for the event.
     """
-    pubsub_message = base64.b64decode(event['data']).decode('utf-8')
+    #pubsub_message = base64.b64decode(event['data']).decode('utf-8')
   
     
     client = bigquery.Client()
     # Perform a query.
 
     sql = (
-     ' SELECT user_screen_name, predicted_label, followers_count, '
-    + ' verified, polarity, subjectivity  '
+     ' SELECT user_screen_name, predicted_label, favourites_count, followers_count, '
+    + ' listed_count, statuses_count, '
+    + ' verified, description_count, polarity, subjectivity  '
     + ' FROM ml.PREDICT(MODEL capstonettw.spot_bot_no_days, ('
     + '   SELECT '
     + '    user_screen_name, user_favourites_count as favourites_count , '
@@ -36,3 +37,6 @@ def run_model_losgistic(event, context):
         df.to_gbq(destination_table="capstonettw.predicted", project_id="heroic-gamma-254018", if_exists='append')
     except Exception as e:
         print(e)
+
+if __name__ == '__main__':
+    run_model_losgistic('x','y')

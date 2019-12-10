@@ -96,7 +96,7 @@ def process_timeline(username, n_weets):
                 tml.append(data)
                             
             if len(tml) >=  BATCH_SIZE:
-                publish(publisher, PUBSUB_TOPIC, tml)
+                publish(publisher, topic_path, tml)
                 tml = []
 
             count += 1
