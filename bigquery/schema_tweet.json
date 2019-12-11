@@ -1,0 +1,84 @@
+[
+  {
+    "name": "created_at",
+    "type": "TIMESTAMP",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "id",
+    "type": "INTEGER",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "text",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "quote_count",
+    "type": "INTEGER",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "reply_count",
+    "type": "INTEGER",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "retweet_count",
+    "type": "INTEGER",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "favorite_count",
+    "type": "INTEGER",
+    "mode": "NULLABLE"
+  },
+  {
+	"name": "user_screen_name",
+	"type": "STRING",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_location",
+	"type": "STRING",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_verified",
+	"type": "BOOLEAN",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_followers_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_friends_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_listed_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_favourites_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_statuses_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "description",
+	"type": "STRING",
+	"mode": "NULLABLE"
+  }
+
+]
+  

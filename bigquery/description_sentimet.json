@@ -1,0 +1,22 @@
+[
+ {
+	"name": "user_screen_name",
+	"type": "STRING",
+	"mode": "NULLABLE"
+  },
+{
+	"name": "desc_polarity",
+	"type": "FLOAT",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "desc_subjectivity",
+	"type": "FLOAT",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "desc_sentiment",
+	"type": "STRING",
+	"mode": "NULLABLE"
+  }
+]

@@ -1,0 +1,52 @@
+[
+ {
+	"name": "user_screen_name",
+	"type": "STRING",
+	"mode": "NULLABLE"
+  },
+{
+	"name": "predicted_label",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+{
+	"name": "favourites_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+{
+	"name": "followers_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+{
+	"name": "listed_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+{
+	"name": "statuses_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+{
+	"name": "verified",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+{
+	"name": "description_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+{
+	"name": "polarity",
+	"type": "FLOAT",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "subjectivity",
+	"type": "FLOAT",
+	"mode": "NULLABLE"
+  }
+]

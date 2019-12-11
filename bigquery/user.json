@@ -1,0 +1,68 @@
+[
+  {
+	"name": "user_screen_name",
+	"type": "STRING",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_followers_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_listed_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_favourites_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_statuses_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "description_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+ {
+	"name": "user_verified",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "creation_days",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "polarity",
+	"type": "FLOAT",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "subjectivity",
+	"type": "FLOAT",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "sentiment_positive",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "sentiment_neutral",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+ {
+	"name": "sentiment_negative",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  }
+]
+  

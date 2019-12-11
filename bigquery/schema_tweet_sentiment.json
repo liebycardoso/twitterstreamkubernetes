@@ -1,0 +1,120 @@
+[
+  {
+    "name": "text",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "quote_count",
+    "type": "INTEGER",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "reply_count",
+    "type": "INTEGER",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "retweet_count",
+    "type": "INTEGER",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "favorite_count",
+    "type": "INTEGER",
+    "mode": "NULLABLE"
+  },
+  {
+	"name": "user_screen_name",
+	"type": "STRING",
+	"mode": "NULLABLE"
+  },
+   {
+	"name": "user_location",
+	"type": "STRING",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_verified",
+	"type": "BOOLEAN",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_followers_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_friends_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_listed_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_favourites_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "user_statuses_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "description",
+	"type": "STRING",
+	"mode": "NULLABLE"
+  },
+
+  {
+    "name": "date",
+    "type": "TIMESTAMP",
+    "mode": "NULLABLE"
+  },
+  {
+	"name": "hashtags",
+	"type": "STRING",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "hashtags_count",
+	"type": "INTEGER",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "polarity",
+	"type": "FLOAT",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "subjectivity",
+	"type": "FLOAT",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "sentiment",
+	"type": "STRING",
+	"mode": "NULLABLE"
+  },
+ {
+	"name": "desc_polarity",
+	"type": "FLOAT",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "desc_subjectivity",
+	"type": "FLOAT",
+	"mode": "NULLABLE"
+  },
+  {
+	"name": "desc_sentiment",
+	"type": "STRING",
+	"mode": "NULLABLE"
+  }
+
+]
+  
